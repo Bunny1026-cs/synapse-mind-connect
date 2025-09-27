@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Brain, ArrowLeft, Shield } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 interface AdminLoginProps {
   onNavigate: (page: string, userData?: any) => void;
@@ -12,40 +12,27 @@ interface AdminLoginProps {
 
 const AdminLogin: React.FC<AdminLoginProps> = ({ onNavigate }) => {
   const [loginData, setLoginData] = useState({
-    username: '',
+    email: '',
     password: ''
   });
-  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const { signIn } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!loginData.username || !loginData.password) {
-      toast({
-        title: "Please fill in all fields",
-        variant: "destructive"
-      });
+    if (!loginData.email || !loginData.password) {
       return;
     }
 
-    // Simple demo credentials
-    if (loginData.username === 'admin' && loginData.password === 'synapse123') {
-      toast({
-        title: "Admin access granted",
-        description: "Welcome to the Synapse admin dashboard."
-      });
-      
-      onNavigate('admin-dashboard', {
-        role: 'admin',
-        name: 'System Administrator',
-        loginTime: new Date().toISOString()
-      });
-    } else {
-      toast({
-        title: "Invalid credentials",
-        description: "Please check your username and password.",
-        variant: "destructive"
-      });
+    setLoading(true);
+    const result = await signIn(loginData.email, loginData.password);
+    setLoading(false);
+    
+    if (result.success) {
+      // The auth hook will handle role checking
+      // Navigation will be handled by the main app when user is authenticated
+      onNavigate('admin-dashboard');
     }
   };
 
@@ -68,13 +55,13 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onNavigate }) => {
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="username">Administrator Username</Label>
+                <Label htmlFor="email">Administrator Email</Label>
                 <Input
-                  id="username"
-                  type="text"
-                  placeholder="Enter admin username"
-                  value={loginData.username}
-                  onChange={(e) => setLoginData({...loginData, username: e.target.value})}
+                  id="email"
+                  type="email"
+                  placeholder="Enter admin email"
+                  value={loginData.email}
+                  onChange={(e) => setLoginData({...loginData, email: e.target.value})}
                   className="glass"
                 />
               </div>
@@ -90,15 +77,15 @@ const AdminLogin: React.FC<AdminLoginProps> = ({ onNavigate }) => {
                 />
               </div>
               
-              <Button type="submit" variant="wellness" className="w-full">
+              <Button type="submit" variant="wellness" className="w-full" disabled={loading}>
                 <Shield className="h-4 w-4 mr-2" />
-                Admin Sign In
+                {loading ? 'Signing In...' : 'Admin Sign In'}
               </Button>
             </form>
             
             <div className="mt-6 pt-6 border-t border-glass-border">
               <div className="text-xs text-muted-foreground text-center mb-4">
-                Demo Credentials: admin / synapse123
+                Use your admin email and password to sign in
               </div>
               <Button
                 variant="ghost"

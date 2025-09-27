@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Brain, ArrowLeft, Eye, EyeOff } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 interface AuthPageProps {
   onNavigate: (page: string, userData?: any) => void;
@@ -24,70 +24,44 @@ const AuthPage: React.FC<AuthPageProps> = ({ onNavigate }) => {
     confirmPassword: '',
     university: ''
   });
-  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+  const { signIn, signUp } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!loginData.email || !loginData.password) {
-      toast({
-        title: "Please fill in all fields",
-        variant: "destructive"
-      });
       return;
     }
 
-    // Simulate successful login
-    toast({
-      title: "Welcome back!",
-      description: "Successfully logged in to Synapse."
-    });
+    setLoading(true);
+    const result = await signIn(loginData.email, loginData.password);
+    setLoading(false);
     
-    onNavigate('assessment', {
-      name: loginData.email.split('@')[0],
-      email: loginData.email,
-      isReturningUser: true
-    });
+    if (result.success) {
+      onNavigate('dashboard');
+    }
   };
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!signupData.name || !signupData.email || !signupData.password || !signupData.university) {
-      toast({
-        title: "Please fill in all fields",
-        variant: "destructive"
-      });
       return;
     }
 
     if (signupData.password !== signupData.confirmPassword) {
-      toast({
-        title: "Passwords don't match",
-        variant: "destructive"
-      });
       return;
     }
 
-    if (!signupData.email.includes('.edu')) {
-      toast({
-        title: "Please use your university email",
-        description: "University email (.edu) required for verification",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    // Simulate successful signup
-    toast({
-      title: "Account created successfully!",
-      description: "Welcome to Synapse. Let's start with a wellness check-in."
-    });
+    setLoading(true);
+    const result = await signUp(signupData.email, signupData.password, signupData.name, signupData.university);
+    setLoading(false);
     
-    onNavigate('assessment', {
-      name: signupData.name,
-      email: signupData.email,
-      university: signupData.university,
-      isNewUser: true
-    });
+    if (result.success) {
+      // Reset form
+      setSignupData({ name: '', email: '', password: '', confirmPassword: '', university: '' });
+    }
   };
 
   return (
@@ -113,11 +87,11 @@ const AuthPage: React.FC<AuthPageProps> = ({ onNavigate }) => {
               <TabsContent value="login">
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">University Email</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
                       type="email"
-                      placeholder="your.name@university.edu"
+                      placeholder="your.email@example.com"
                       value={loginData.email}
                       onChange={(e) => setLoginData({...loginData, email: e.target.value})}
                       className="glass"
@@ -146,20 +120,8 @@ const AuthPage: React.FC<AuthPageProps> = ({ onNavigate }) => {
                     </div>
                   </div>
                   
-                  <Button type="submit" variant="wellness" className="w-full">
-                    Sign In
-                  </Button>
-                  
-                  <Button 
-                    type="button" 
-                    variant="link" 
-                    className="w-full text-sm"
-                    onClick={() => toast({
-                      title: "Password Reset",
-                      description: "Password reset link would be sent to your email."
-                    })}
-                  >
-                    Forgot your password?
+                  <Button type="submit" variant="wellness" className="w-full" disabled={loading}>
+                    {loading ? 'Signing In...' : 'Sign In'}
                   </Button>
                 </form>
               </TabsContent>
@@ -178,11 +140,11 @@ const AuthPage: React.FC<AuthPageProps> = ({ onNavigate }) => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email">University Email</Label>
+                    <Label htmlFor="signup-email">Email</Label>
                     <Input
                       id="signup-email"
                       type="email"
-                      placeholder="your.name@university.edu"
+                      placeholder="your.email@example.com"
                       value={signupData.email}
                       onChange={(e) => setSignupData({...signupData, email: e.target.value})}
                       className="glass"
@@ -222,8 +184,9 @@ const AuthPage: React.FC<AuthPageProps> = ({ onNavigate }) => {
                     />
                   </div>
                   
-                  <Button type="submit" variant="wellness" className="w-full">
-                    Create Account
+                  <Button type="submit" variant="wellness" className="w-full" disabled={loading}>
+                    <Brain className="h-4 w-4 mr-2" />
+                    {loading ? 'Creating Account...' : 'Create Account'}
                   </Button>
                 </form>
               </TabsContent>
