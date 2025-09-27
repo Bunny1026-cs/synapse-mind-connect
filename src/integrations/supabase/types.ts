@@ -14,6 +14,213 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          appointment_date: string
+          counselor_id: string
+          created_at: string
+          duration_minutes: number | null
+          id: string
+          is_emergency: boolean | null
+          meeting_link: string | null
+          notes: string | null
+          status: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          appointment_date: string
+          counselor_id: string
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          is_emergency?: boolean | null
+          meeting_link?: string | null
+          notes?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          appointment_date?: string
+          counselor_id?: string
+          created_at?: string
+          duration_minutes?: number | null
+          id?: string
+          is_emergency?: boolean | null
+          meeting_link?: string | null
+          notes?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_counselor_id_fkey"
+            columns: ["counselor_id"]
+            isOneToOne: false
+            referencedRelation: "counselors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "chat_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_sessions: {
+        Row: {
+          created_at: string
+          id: string
+          status: string | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          status?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          status?: string | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      counselors: {
+        Row: {
+          availability: Json | null
+          bio: string | null
+          created_at: string
+          id: string
+          image_url: string | null
+          is_available: boolean | null
+          name: string
+          rating: number | null
+          specialization: string
+          total_sessions: number | null
+          updated_at: string
+        }
+        Insert: {
+          availability?: Json | null
+          bio?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_available?: boolean | null
+          name: string
+          rating?: number | null
+          specialization: string
+          total_sessions?: number | null
+          updated_at?: string
+        }
+        Update: {
+          availability?: Json | null
+          bio?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          is_available?: boolean | null
+          name?: string
+          rating?: number | null
+          specialization?: string
+          total_sessions?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      crisis_interventions: {
+        Row: {
+          assessment_id: string | null
+          created_at: string
+          crisis_type: string
+          follow_up_date: string | null
+          follow_up_required: boolean | null
+          id: string
+          intervention_taken: string
+          notes: string | null
+          resolved: boolean | null
+          severity_level: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          assessment_id?: string | null
+          created_at?: string
+          crisis_type: string
+          follow_up_date?: string | null
+          follow_up_required?: boolean | null
+          id?: string
+          intervention_taken: string
+          notes?: string | null
+          resolved?: boolean | null
+          severity_level: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          assessment_id?: string | null
+          created_at?: string
+          crisis_type?: string
+          follow_up_date?: string | null
+          follow_up_required?: boolean | null
+          id?: string
+          intervention_taken?: string
+          notes?: string | null
+          resolved?: boolean | null
+          severity_level?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crisis_interventions_assessment_id_fkey"
+            columns: ["assessment_id"]
+            isOneToOne: false
+            referencedRelation: "wellness_assessments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -59,6 +266,93 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      wellness_assessments: {
+        Row: {
+          academic_pressure: number
+          created_at: string
+          energy_level: number
+          id: string
+          mood_rating: number
+          notes: string | null
+          overall_score: number | null
+          risk_level: string | null
+          sleep_quality: number
+          social_connection: number
+          stress_level: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          academic_pressure: number
+          created_at?: string
+          energy_level: number
+          id?: string
+          mood_rating: number
+          notes?: string | null
+          overall_score?: number | null
+          risk_level?: string | null
+          sleep_quality: number
+          social_connection: number
+          stress_level: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          academic_pressure?: number
+          created_at?: string
+          energy_level?: number
+          id?: string
+          mood_rating?: number
+          notes?: string | null
+          overall_score?: number | null
+          risk_level?: string | null
+          sleep_quality?: number
+          social_connection?: number
+          stress_level?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wellness_resources: {
+        Row: {
+          category: string
+          content: string | null
+          content_url: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_crisis_resource: boolean | null
+          resource_type: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          content?: string | null
+          content_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_crisis_resource?: boolean | null
+          resource_type: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          content?: string | null
+          content_url?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_crisis_resource?: boolean | null
+          resource_type?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
